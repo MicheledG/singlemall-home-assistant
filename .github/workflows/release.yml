@@ -1,0 +1,39 @@
+# Each version tag becomes a GitHub release, which HACS offers as an update.
+# This repository is generated: every commit and tag arrives from the
+# integration's source, so nothing here is edited by hand.
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: HACS validation
+        uses: hacs/action@main
+        with:
+          category: integration
+          # A custom repository: the integration is not in the brands list.
+          ignore: brands
+      - name: Hassfest
+        uses: home-assistant/actions/hassfest@master
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --generate-notes

@@ -1,0 +1,69 @@
+{
+  "config": {
+    "step": {
+      "pick_implementation": {
+        "title": "Choose how to sign in"
+      },
+      "reauth_confirm": {
+        "title": "Sign in to SingleMall again",
+        "description": "Home Assistant can no longer reach your SingleMall shopping list. Sign in again with the account you use on your phone."
+      }
+    },
+    "abort": {
+      "already_configured": "This SingleMall account is already added.",
+      "already_in_progress": "A sign-in is already in progress.",
+      "reauth_successful": "You are signed in again.",
+      "wrong_account": "You signed in with a different account. Sign in with the account this list belongs to.",
+      "not_configured": "This copy of the SingleMall integration is not set up for a SingleMall service yet. See the Home Assistant log for what is missing.",
+      "not_allowed": "This account is not allowed to use SingleMall. Ask the person who invited you, or sign in with the account you use on your phone.",
+      "cannot_connect": "SingleMall could not be reached. Try again in a moment.",
+      "unknown": "Something unexpected went wrong. Try again in a moment.",
+      "missing_configuration": "The sign-in for SingleMall is not available.",
+      "missing_credentials": "The sign-in for SingleMall is not available.",
+      "authorize_url_timeout": "Timed out while preparing the sign-in page.",
+      "no_url_available": "Home Assistant has no address to come back to after the sign-in. See {docs_url}.",
+      "oauth_error": "The sign-in returned something unexpected.",
+      "oauth_failed": "The sign-in could not be completed.",
+      "oauth_timeout": "The sign-in took too long.",
+      "oauth_unauthorized": "The sign-in was refused.",
+      "oauth_implementation_unavailable": "The sign-in for SingleMall is not available.",
+      "user_rejected_authorize": "The sign-in was cancelled: {error}"
+    },
+    "create_entry": {
+      "default": "You are signed in. Your shopping list is now a to-do list."
+    }
+  },
+  "entity": {
+    "todo": {
+      "shopping_list": {
+        "name": "Shopping list"
+      }
+    }
+  },
+  "exceptions": {
+    "not_configured": {
+      "message": "The SingleMall integration is not set up for a SingleMall service yet. See the log for what is missing."
+    },
+    "implementation_unavailable": {
+      "message": "The sign-in for SingleMall is not available yet."
+    },
+    "auth_failed": {
+      "message": "Your SingleMall sign-in is no longer valid. Sign in again."
+    },
+    "update_failed": {
+      "message": "The shopping list could not be read ({code})."
+    },
+    "request_failed": {
+      "message": "SingleMall could not make the change ({code})."
+    },
+    "item_not_found": {
+      "message": "That item is no longer on the shopping list."
+    },
+    "invalid_body": {
+      "message": "Give the item some words."
+    },
+    "product_name": {
+      "message": "An item chosen from the catalogue keeps its product's name and cannot be renamed."
+    }
+  }
+}

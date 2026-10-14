@@ -1,0 +1,69 @@
+{
+  "config": {
+    "step": {
+      "pick_implementation": {
+        "title": "Scegli come accedere"
+      },
+      "reauth_confirm": {
+        "title": "Accedi di nuovo a SingleMall",
+        "description": "Home Assistant non riesce più a raggiungere la tua lista della spesa di SingleMall. Accedi di nuovo con l'account che usi sul telefono."
+      }
+    },
+    "abort": {
+      "already_configured": "Questo account SingleMall è già stato aggiunto.",
+      "already_in_progress": "Un accesso è già in corso.",
+      "reauth_successful": "Hai effettuato di nuovo l'accesso.",
+      "wrong_account": "Hai effettuato l'accesso con un altro account. Accedi con l'account a cui appartiene questa lista.",
+      "not_configured": "Questa copia dell'integrazione SingleMall non è ancora collegata a un servizio SingleMall. Nel registro di Home Assistant trovi cosa manca.",
+      "not_allowed": "Questo account non può usare SingleMall. Chiedi a chi ti ha invitato, oppure accedi con l'account che usi sul telefono.",
+      "cannot_connect": "Impossibile raggiungere SingleMall. Riprova tra poco.",
+      "unknown": "Si è verificato un errore imprevisto. Riprova tra poco.",
+      "missing_configuration": "L'accesso a SingleMall non è disponibile.",
+      "missing_credentials": "L'accesso a SingleMall non è disponibile.",
+      "authorize_url_timeout": "Tempo scaduto durante la preparazione della pagina di accesso.",
+      "no_url_available": "Home Assistant non ha un indirizzo a cui tornare dopo l'accesso. Vedi {docs_url}.",
+      "oauth_error": "L'accesso ha restituito una risposta inattesa.",
+      "oauth_failed": "Impossibile completare l'accesso.",
+      "oauth_timeout": "L'accesso ha richiesto troppo tempo.",
+      "oauth_unauthorized": "L'accesso è stato rifiutato.",
+      "oauth_implementation_unavailable": "L'accesso a SingleMall non è disponibile.",
+      "user_rejected_authorize": "Accesso annullato: {error}"
+    },
+    "create_entry": {
+      "default": "Accesso effettuato. La tua lista della spesa ora è una lista di cose da fare."
+    }
+  },
+  "entity": {
+    "todo": {
+      "shopping_list": {
+        "name": "Spesa"
+      }
+    }
+  },
+  "exceptions": {
+    "not_configured": {
+      "message": "L'integrazione SingleMall non è ancora collegata a un servizio SingleMall. Nel registro trovi cosa manca."
+    },
+    "implementation_unavailable": {
+      "message": "L'accesso a SingleMall non è ancora disponibile."
+    },
+    "auth_failed": {
+      "message": "L'accesso a SingleMall non è più valido. Accedi di nuovo."
+    },
+    "update_failed": {
+      "message": "Impossibile leggere la lista della spesa ({code})."
+    },
+    "request_failed": {
+      "message": "SingleMall non è riuscito ad applicare la modifica ({code})."
+    },
+    "item_not_found": {
+      "message": "Questa voce non è più nella lista della spesa."
+    },
+    "invalid_body": {
+      "message": "Scrivi qualche parola per la voce."
+    },
+    "product_name": {
+      "message": "Una voce scelta dal catalogo mantiene il nome del prodotto e non può essere rinominata."
+    }
+  }
+}
