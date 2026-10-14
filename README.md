@@ -5,7 +5,7 @@ once with the account you use on your phone; after that Home Assistant can
 add an item in words, change the words of an item you typed, write or clear
 a note, tick and untick, and remove items. Each change reaches your phones,
 and your group's phones, the same way a change made in the app does. A change
-made on a phone shows up in Home Assistant within about 30 seconds.
+made on a phone shows up in Home Assistant within a few seconds.
 
 **It is for people already allowed to use SingleMall.** Anybody else can
 install it, but the sign-in refuses their account.
@@ -20,7 +20,10 @@ prices are not.
    **Integration**.
 3. Find **SingleMall** in HACS, download it, and restart Home Assistant.
 4. Go to Settings → Devices & services → **Add integration** → SingleMall,
-   and sign in.
+   and sign in. The first time, the browser stops at My Home Assistant
+   and asks for your Home Assistant's address: type the one you open it
+   with (for example `http://homeassistant.local:8123`). It is kept in that
+   browser only, and sign-in then finishes on its own.
 
 When a new version is out, HACS shows it as an update: install it and
 restart.

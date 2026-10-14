@@ -1,4 +1,4 @@
-"""The shopping list, read every 30 seconds with ``If-None-Match``."""
+"""The shopping list, read with ``If-None-Match`` when the doorbell rings and every 30 minutes."""
 
 from __future__ import annotations
 
@@ -25,7 +25,7 @@ class SingleMallCoordinator(DataUpdateCoordinator[list[Line]]):
     def __init__(
         self, hass: HomeAssistant, entry: SingleMallConfigEntry, api: SingleMallApi
     ) -> None:
-        """Poll the list for one config entry."""
+        """Read the list for one config entry."""
         super().__init__(
             hass,
             _LOGGER,

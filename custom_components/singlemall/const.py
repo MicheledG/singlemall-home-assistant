@@ -1,9 +1,9 @@
 """Constants for the SingleMall integration.
 
-The three deployment constants below are public configuration, not secrets:
-a public Cognito app client id, the hosted sign-in origin and the API base
-URL, all printed as outputs of the SingleMall stack. The app on the phone
-carries the same kind of values.
+The four deployment constants below are public configuration, not secrets:
+a public Cognito app client id, the hosted sign-in origin, the API base URL
+and the doorbell's WebSocket URL, all printed as outputs of the SingleMall
+stack. The app on the phone carries the same kind of values.
 
 They were obviously invalid placeholders until the first deploy; while
 any of them is a placeholder, the config flow aborts and a config
@@ -21,22 +21,25 @@ DOMAIN = "singlemall"
 PLACEHOLDER_MARKER = "REPLACE-ME"
 
 # ---------------------------------------------------------------------------
-# Fill these three from the stack outputs after the first deploy.
+# Fill these four from the stack outputs after the first deploy.
 #
 # CLIENT_ID      <- output `HomeAssistantClientId`
 # COGNITO_DOMAIN <- output `UserPoolSignInUrl` (the hosted sign-in origin,
 #                   e.g. https://<prefix>.auth.<region>.amazoncognito.com,
 #                   without a trailing slash)
 # API_URL        <- output `HomeAssistantApiUrl` (without a trailing slash)
+# PUSH_URL       <- output `HomeAssistantPushUrl` (wss://…/live)
 # ---------------------------------------------------------------------------
 CLIENT_ID = "32vaagri89o9kg01cagftiqvah"
 COGNITO_DOMAIN = "https://singlemall-347434961513-eu-south-1.auth.eu-south-1.amazoncognito.com"
 API_URL = "https://z1iulx53x0.execute-api.eu-south-1.amazonaws.com"
+PUSH_URL = "wss://iybob0ja19.execute-api.eu-south-1.amazonaws.com/live"
 
 SCOPES = ("openid", "email", "profile")
 
-# How often the list is read; a 304 makes an unchanged poll cheap.
-UPDATE_INTERVAL = timedelta(seconds=30)
+# How often the list is read without being told it changed: the safety net
+# under the doorbell (push.py), which is how a change normally arrives.
+UPDATE_INTERVAL = timedelta(minutes=30)
 
 # A single request's ceiling; the function itself times out at 10 seconds.
 REQUEST_TIMEOUT_SECONDS = 15
@@ -75,10 +78,15 @@ def api_url() -> str:
     return _module_value("API_URL").rstrip("/")
 
 
+def push_url() -> str:
+    """The doorbell's WebSocket URL."""
+    return _module_value("PUSH_URL").rstrip("/")
+
+
 def missing_constants() -> list[str]:
     """The names of the deployment constants still left as placeholders."""
     return [
         name
-        for name in ("CLIENT_ID", "COGNITO_DOMAIN", "API_URL")
+        for name in ("CLIENT_ID", "COGNITO_DOMAIN", "API_URL", "PUSH_URL")
         if PLACEHOLDER_MARKER in _module_value(name) or not _module_value(name)
     ]

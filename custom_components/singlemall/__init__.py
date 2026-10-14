@@ -1,8 +1,9 @@
 """SingleMall: the shopping list as a Home Assistant to-do list.
 
 One config entry per signed-in person, one to-do entity per entry, fed by a
-coordinator that polls the list; the sign-in is Home Assistant's own OAuth2
-flow with PKCE.
+coordinator that reads the list when SingleMall rings its doorbell (push.py)
+and every thirty minutes regardless; the sign-in is Home Assistant's own
+OAuth2 flow with PKCE.
 """
 
 from __future__ import annotations
@@ -21,7 +22,7 @@ from homeassistant.exceptions import (
 from homeassistant.helpers import config_entry_oauth2_flow
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
-from . import const
+from . import const, push
 from .api import AuthError, OAuth2SessionAuth, SingleMallApi, SingleMallError
 from .const import DOMAIN, REQUEST_TIMEOUT_SECONDS
 from .coordinator import SingleMallConfigEntry, SingleMallCoordinator
@@ -73,6 +74,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: SingleMallConfigEntry) -
     coordinator = SingleMallCoordinator(hass, entry, api)
     await coordinator.async_config_entry_first_refresh()
     entry.runtime_data = coordinator
+
+    doorbell = push.Doorbell(const.push_url(), auth, push.connect_for(hass), coordinator.async_request_refresh)
+    entry.async_create_background_task(hass, doorbell.run(), f"{DOMAIN} doorbell")
+    entry.async_on_unload(doorbell.stop)
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
