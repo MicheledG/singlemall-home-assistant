@@ -28,12 +28,12 @@ PLACEHOLDER_MARKER = "REPLACE-ME"
 #                   e.g. https://<prefix>.auth.<region>.amazoncognito.com,
 #                   without a trailing slash)
 # API_URL        <- output `HomeAssistantApiUrl` (without a trailing slash)
-# PUSH_URL       <- output `HomeAssistantPushUrl` (wss://…/live)
+# PUSH_URL       <- output `HomeAssistantPushUrl` (wss://ha-push.<site>)
 # ---------------------------------------------------------------------------
 CLIENT_ID = "32vaagri89o9kg01cagftiqvah"
 COGNITO_DOMAIN = "https://singlemall-347434961513-eu-south-1.auth.eu-south-1.amazoncognito.com"
-API_URL = "https://z1iulx53x0.execute-api.eu-south-1.amazonaws.com"
-PUSH_URL = "wss://iybob0ja19.execute-api.eu-south-1.amazonaws.com/live"
+API_URL = "https://ha.singlemall.micheledg.it"
+PUSH_URL = "wss://ha-push.singlemall.micheledg.it"
 
 SCOPES = ("openid", "email", "profile")
 
