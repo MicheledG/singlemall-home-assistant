@@ -3,7 +3,7 @@
 One config entry per signed-in person, one to-do entity per entry, fed by a
 coordinator that reads the list when SingleMall rings its doorbell (push.py)
 and every thirty minutes regardless; the sign-in is Home Assistant's own
-OAuth2 flow with PKCE.
+OAuth2 flow with PKCE. Installed and updated through HACS.
 """
 
 from __future__ import annotations
