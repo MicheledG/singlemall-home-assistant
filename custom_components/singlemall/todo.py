@@ -48,12 +48,17 @@ async def async_setup_entry(
     async_add_entities([SingleMallShoppingList(entry.runtime_data)])
 
 
+def describe_parts(quantity: int, note: str | None) -> str | None:
+    """A description from a quantity and a note: ``×N`` when N > 1, then the note."""
+    prefix = f"{QUANTITY_SIGN}{quantity}" if quantity > 1 else None
+    if prefix and note:
+        return f"{prefix}{_SEPARATOR}{note}"
+    return prefix or note
+
+
 def describe(line: Line) -> str | None:
     """The item description: ``×N`` when N > 1, then the note."""
-    quantity = f"{QUANTITY_SIGN}{line.quantity}" if line.quantity > 1 else None
-    if quantity and line.note:
-        return f"{quantity}{_SEPARATOR}{line.note}"
-    return quantity or line.note
+    return describe_parts(line.quantity, line.note)
 
 
 def read_description(description: str | None) -> tuple[int | None, str | None]:

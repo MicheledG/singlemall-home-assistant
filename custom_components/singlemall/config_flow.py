@@ -6,9 +6,23 @@ from collections.abc import Mapping
 import logging
 from typing import Any
 
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigFlowResult
+from homeassistant.config_entries import (
+    SOURCE_REAUTH,
+    ConfigEntry,
+    ConfigFlowResult,
+    OptionsFlowWithReload,
+)
+from homeassistant.core import callback
 from homeassistant.helpers import config_entry_oauth2_flow
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.helpers.selector import (
+    EntitySelector,
+    EntitySelectorConfig,
+    NumberSelector,
+    NumberSelectorConfig,
+    NumberSelectorMode,
+)
+import voluptuous as vol
 
 from . import const
 from .api import (
@@ -20,6 +34,7 @@ from .api import (
     StaticTokenAuth,
 )
 from .const import DOMAIN
+from .mirror import CONF_ENTITY, CONF_INTERVAL, DEFAULT_INTERVAL, OWN_ENTITY_ID
 from .oauth import async_register_implementation, token_claims
 
 _LOGGER = logging.getLogger(__name__)
@@ -30,6 +45,12 @@ class SingleMallFlowHandler(config_entry_oauth2_flow.AbstractOAuth2FlowHandler, 
 
     DOMAIN = DOMAIN
     VERSION = 1
+
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry: ConfigEntry) -> SingleMallOptionsFlow:
+        """The options: which other to-do list to mirror, and how often to check it."""
+        return SingleMallOptionsFlow()
 
     @property
     def logger(self) -> logging.Logger:
@@ -96,3 +117,32 @@ class SingleMallFlowHandler(config_entry_oauth2_flow.AbstractOAuth2FlowHandler, 
         email = claims.get("email")
         title = email if isinstance(email, str) and email else "SingleMall"
         return self.async_create_entry(title=title, data=data)
+
+
+class SingleMallOptionsFlow(OptionsFlowWithReload):
+    """Pick the to-do list to mirror; leaving it empty turns the mirror off."""
+
+    async def async_step_init(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+        """One form: the list and the check interval in minutes."""
+        if user_input is not None:
+            return self.async_create_entry(data=user_input)
+        schema = vol.Schema(
+            {
+                vol.Optional(CONF_ENTITY): EntitySelector(
+                    EntitySelectorConfig(domain="todo", exclude_entities=[OWN_ENTITY_ID])
+                ),
+                vol.Optional(CONF_INTERVAL, default=DEFAULT_INTERVAL): NumberSelector(
+                    NumberSelectorConfig(
+                        min=1,
+                        max=1440,
+                        step=1,
+                        mode=NumberSelectorMode.BOX,
+                        unit_of_measurement="min",
+                    )
+                ),
+            }
+        )
+        return self.async_show_form(
+            step_id="init",
+            data_schema=self.add_suggested_values_to_schema(schema, self.config_entry.options),
+        )

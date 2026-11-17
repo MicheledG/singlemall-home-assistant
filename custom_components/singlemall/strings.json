@@ -65,5 +65,22 @@
     "product_name": {
       "message": "An item chosen from the catalogue keeps its product's name and cannot be renamed."
     }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Mirror list",
+        "data": {
+          "mirror_entity": "List to mirror",
+          "mirror_interval": "Check every (minutes)"
+        }
+      }
+    }
+  },
+  "issues": {
+    "mirror_mass_removal": {
+      "title": "The mirrored list was emptied",
+      "description": "The other list has no lines left, and nothing was removed from SingleMall. Check the other list: the mirror carries on by itself once it is back."
+    }
   }
 }

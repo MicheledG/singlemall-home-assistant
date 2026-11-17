@@ -65,5 +65,22 @@
     "product_name": {
       "message": "Una voce scelta dal catalogo mantiene il nome del prodotto e non può essere rinominata."
     }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Lista specchio",
+        "data": {
+          "mirror_entity": "Lista da rispecchiare",
+          "mirror_interval": "Controllo ogni (minuti)"
+        }
+      }
+    }
+  },
+  "issues": {
+    "mirror_mass_removal": {
+      "title": "La lista specchio è stata svuotata",
+      "description": "L'altra lista non ha più nessuna riga e non è stato tolto nulla da SingleMall. Controlla l'altra lista: il sync riparte da solo quando torna a posto."
+    }
   }
 }

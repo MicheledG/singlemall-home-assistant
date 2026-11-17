@@ -21,11 +21,13 @@ from homeassistant.exceptions import (
 )
 from homeassistant.helpers import config_entry_oauth2_flow
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.helpers.storage import Store
 
 from . import const, push
 from .api import AuthError, OAuth2SessionAuth, SingleMallApi, SingleMallError
 from .const import DOMAIN, REQUEST_TIMEOUT_SECONDS
 from .coordinator import SingleMallConfigEntry, SingleMallCoordinator
+from .mirror import CONF_ENTITY, CONF_INTERVAL, DEFAULT_INTERVAL, Mirror, storage_key
 from .oauth import async_register_implementation
 
 _LOGGER = logging.getLogger(__name__)
@@ -80,6 +82,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: SingleMallConfigEntry) -
     entry.async_on_unload(doorbell.stop)
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+
+    other = entry.options.get(CONF_ENTITY)
+    if other:
+        interval = int(entry.options.get(CONF_INTERVAL, DEFAULT_INTERVAL))
+        mirror = Mirror(hass, entry, str(other), interval)
+        await mirror.async_start()
+        entry.async_on_unload(mirror.async_stop)
+    else:
+        # Turned off: what a mirror remembered is of no use to the next one.
+        await Store(hass, 1, storage_key(entry.entry_id)).async_remove()
     return True
 
 
@@ -99,6 +111,7 @@ async def async_remove_entry(hass: HomeAssistant, entry: SingleMallConfigEntry) 
     stays valid until it expires (one hour), because the API verifies tokens
     without asking the sign-in service.
     """
+    await Store(hass, 1, storage_key(entry.entry_id)).async_remove()
     token = entry.data.get("token") or {}
     refresh_token = token.get("refresh_token")
     if not isinstance(refresh_token, str) or not refresh_token or const.missing_constants():

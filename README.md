@@ -43,6 +43,17 @@ place, keeping its quantity, tick and note. An item picked from the
 catalogue keeps its product's name, so renaming it is refused with a
 message.
 
+## Mirroring another to-do list
+
+In the integration's options, pick another to-do list (the Alexa shopping
+list, say) and the two lists are kept in step in both directions: a line
+added, ticked, unticked or removed on one appears on the other, and the most
+recent change wins. Additions, removals and ticks follow as soon as Home
+Assistant reports them; an edit made in place (a new name, a changed note or
+quantity) is found at the next check, every 15 minutes unless you set another
+interval. A list that cannot hold a description gets the quantity as `name ×N`
+and keeps the note only here. Leaving the list empty turns the mirror off.
+
 ## Signing in
 
 The only sign-in callback the app client allows is
