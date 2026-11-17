@@ -51,8 +51,11 @@ added, ticked, unticked or removed on one appears on the other, and the most
 recent change wins. Additions, removals and ticks follow as soon as Home
 Assistant reports them; an edit made in place (a new name, a changed note or
 quantity) is found at the next check, every 15 minutes unless you set another
-interval. A list that cannot hold a description gets the quantity as `name ×N`
-and keeps the note only here. Leaving the list empty turns the mirror off.
+interval. A list that cannot hold a description gets only the name: quantity and note
+stay here, and saying the same name again there raises the quantity here
+and leaves one line over there. If the other list is emptied entirely, the mirror holds
+the run and raises a repair: press Fix to empty SingleMall's list too.
+Leaving the list empty in the options turns the mirror off.
 
 ## Signing in
 

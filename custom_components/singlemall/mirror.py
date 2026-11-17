@@ -49,12 +49,15 @@ DEFAULT_INTERVAL = 15
 OWN_ENTITY_ID = "todo.singlemall_shopping_list"
 
 ISSUE_MASS_REMOVAL = "mirror_mass_removal"
-# A run removing this many mirrored lines, and all of them, is not applied.
+MIRRORS = "mirrors"
+# A run that finds the other list empty and would remove this many mirrored
+# lines is not applied.
 MASS_REMOVAL_MIN = 3
 
 STORAGE_VERSION = 1
 
-# "milk ×3" in a list that has no description to put the quantity in.
+# "milk ×3" typed over there is a quantity. A list without descriptions never
+# gets one written into its names: the quantity stays here.
 _TRAILING_QUANTITY = re.compile(rf"^(.*?)\s*{QUANTITY_SIGN}\s*(\d+)\s*$", re.DOTALL)
 
 
@@ -146,6 +149,7 @@ class Mirror:
         self._pairs: list[Pair] | None = None
         self._dirty = False
         self._running = False
+        self._force = False
         self._unsubscribe: list[Callable[[], None]] = []
 
     async def async_start(self) -> None:
@@ -153,6 +157,7 @@ class Mirror:
         stored = await self._store.async_load()
         if stored is not None:
             self._pairs = [Pair.from_json(item) for item in stored.get("pairs", [])]
+        self.hass.data.setdefault(DOMAIN, {}).setdefault(MIRRORS, {})[self.entry.entry_id] = self
         self._unsubscribe = [
             async_track_state_change_event(self.hass, [self.other], self._on_other_change),
             self.entry.runtime_data.async_add_listener(self.request),
@@ -166,6 +171,13 @@ class Mirror:
         for unsubscribe in self._unsubscribe:
             unsubscribe()
         self._unsubscribe = []
+        self.hass.data.get(DOMAIN, {}).get(MIRRORS, {}).pop(self.entry.entry_id, None)
+
+    @callback
+    def apply_anyway(self) -> None:
+        """The person confirmed the emptied list is meant: the next run removes the lines."""
+        self._force = True
+        self.request()
 
     @callback
     def _on_other_change(self, event: Event[EventStateChangedData]) -> None:
@@ -230,9 +242,10 @@ class Mirror:
             if described:
                 quantity, note = read_description(item.get("description"))
             else:
-                # Nothing to hold a note: keep the one we remember.
+                # Nothing to hold a note or a quantity: keep the ones we remember.
                 known = snapshot.get(str(item["uid"]))
                 note = known.view.note if known else None
+                quantity = known.view.quantity if known else None
             views[str(item["uid"])] = View(
                 name=name,
                 quantity=quantity or name_quantity or 1,
@@ -242,9 +255,13 @@ class Mirror:
         return views
 
     def _summary(self, view: View) -> str:
-        if view.quantity > 1 and not self._supports_description():
-            return f"{view.name} {QUANTITY_SIGN}{view.quantity}"
         return view.name
+
+    def _same(self, a: View, b: View) -> bool:
+        """Do two views say the same thing to the other list?"""
+        if self._supports_description():
+            return a.key() == b.key()
+        return (norm(a.name), a.ticked) == (norm(b.name), b.ticked)
 
     def _description(self, view: View) -> str:
         return describe_parts(view.quantity, view.note) or ""
@@ -325,12 +342,14 @@ class Mirror:
         ours = {line.id: line for line in coordinator.data}
         self._repair_uids(pairs, theirs)
 
-        if self._mass_removal(pairs, ours, theirs):
+        forced, self._force = self._force, False
+        if not forced and self._mass_removal(pairs, ours, theirs):
             ir.async_create_issue(
                 self.hass,
                 DOMAIN,
                 f"{ISSUE_MASS_REMOVAL}_{self.entry.entry_id}",
-                is_fixable=False,
+                data={"entry_id": self.entry.entry_id},
+                is_fixable=True,
                 severity=ir.IssueSeverity.WARNING,
                 translation_key=ISSUE_MASS_REMOVAL,
             )
@@ -358,7 +377,9 @@ class Mirror:
     def _mass_removal(
         self, pairs: list[Pair], ours: dict[str, Line], theirs: dict[str, View]
     ) -> bool:
-        """Would this run take every mirrored line off our list, three or more?"""
+        """Is the other list empty, and would that take three or more mirrored lines off ours?"""
+        if theirs:
+            return False
         held = [pair for pair in pairs if pair.line_id in ours]
         gone = [pair for pair in held if pair.other_uid not in theirs]
         return len(gone) >= MASS_REMOVAL_MIN and len(gone) == len(held)
@@ -389,7 +410,7 @@ class Mirror:
                 mine = our_view(ours_line)
                 if mine.key() != pair.view.key():
                     # Ours changed (and wins if theirs did too).
-                    if mine.key() != theirs_view.key():
+                    if not self._same(mine, theirs_view):
                         await self._other_update(pair.other_uid, mine)
                     pair.view = mine
                 elif theirs_view.key() != pair.view.key():
@@ -407,7 +428,7 @@ class Mirror:
                 unmatched_ours.append(line)
                 continue
             pairs.append(Pair(line.id, uid, our_view(line)))
-            if our_view(line).key() != new_theirs[uid].key():
+            if not self._same(our_view(line), new_theirs[uid]):
                 await self._other_update(uid, our_view(line))
             del new_theirs[uid]
 

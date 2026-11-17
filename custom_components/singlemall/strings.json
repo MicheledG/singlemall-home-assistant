@@ -80,7 +80,15 @@
   "issues": {
     "mirror_mass_removal": {
       "title": "The mirrored list was emptied",
-      "description": "The other list has no lines left, and nothing was removed from SingleMall. Check the other list: the mirror carries on by itself once it is back."
+      "fix_flow": {
+        "step": {
+          "confirm": {
+            "title": "Empty the SingleMall list too?",
+            "description": "This removes the lines the other list no longer has from the SingleMall list."
+          }
+        }
+      },
+      "description": "The other list has no lines left, so nothing was removed from SingleMall. If you emptied it on purpose, press Fix to remove them here too."
     }
   }
 }
