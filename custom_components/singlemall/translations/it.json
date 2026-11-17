@@ -84,11 +84,10 @@
         "step": {
           "confirm": {
             "title": "Svuotare anche la lista SingleMall?",
-            "description": "Toglie dalla lista SingleMall le righe che l'altra lista non ha più."
+            "description": "L'altra lista non ha più righe, quindi da SingleMall non è stato tolto nulla. Togliere le righe anche qui?"
           }
         }
-      },
-      "description": "L'altra lista non ha più righe, quindi da SingleMall non è stato tolto nulla. Se l'hai svuotata di proposito, premi Correggi per togliere le righe anche qui."
+      }
     }
   }
 }
